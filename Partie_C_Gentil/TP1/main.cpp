@@ -29,6 +29,7 @@ using namespace std;
 
 quat defaultPos;
 mat4 rotRed,rotBlue,rotGreen;
+mat4 trans = glm::mat4(1.0f);
 float angleR = 0., angleG = 0., angleB = 0.;
 //****************************************
 
@@ -106,34 +107,26 @@ int main(int argc,char **argv)
 
 
 void bras() {
-    // a animer par interpolation de matrice
     glPushMatrix();
     glMultMatrixf(&rotRed[0][0]);
         glColor3f(1,0,0);
         glScalef(1,.2,.2);
         glTranslatef(.5,0.,0.);
         glutSolidCube(1.);
-    glPopMatrix();
-
-    // a animer par interpolation de matrice
-    glPushMatrix();
-    glMultMatrixf(&rotGreen[0][0]);
+        glPushMatrix();
+      glMultMatrixf(&rotGreen[0][0]);
         glColor3f(0,1,0);
-        glScalef(2,.2,.2);
-        glTranslatef(1,0.,0.);
+        glScalef(4,.2,.2);
+        glTranslatef(0.5,0.,0.);
         glutSolidCube(1.);
-    glPopMatrix();
-
-    // // a animer par interpolation de matrice
-    glPushMatrix();
-    glMultMatrixf(&rotBlue[0][0]);
-        glColor3f(0,0,1);
-        glScalef(1,.2,.2);
-        glTranslatef(3.5,0.,0.);
-        glutSolidCube(1.);
-    glPopMatrix();
-
-
+        glPushMatrix();
+          glMultMatrixf(&rotBlue[0][0]);
+          glColor3f(0,0,1);
+          glScalef(2,.2,.2);
+          glTranslatef(.5,0.,0.);
+          glutSolidCube(1.);
+        glPopMatrix();
+      glPopMatrix();
     glPopMatrix();
 }
 
@@ -182,33 +175,33 @@ void clavier(unsigned char touche,int x,int y)
   switch (touche)
     {
     case '1':
-      angleR+=10.;
-      rotRed = toMat4(angleAxis((float)degrees(angleR), vec3(0.,0.,1.)));
+      angleR+=.5;
+      rotRed = glm::rotate(trans, glm::radians(angleR), glm::vec3(0.0, 0.0, 1.0));
       glutPostRedisplay();
       break;
     case '2':
-      angleR-=10.;
-      rotRed = toMat4(angleAxis((float)degrees(angleR), vec3(0.,0.,1.)));
+      angleR-=.5;
+      rotRed = glm::rotate(trans, glm::radians(angleR), glm::vec3(0.0, 0.0, 1.0));
       glutPostRedisplay();
       break;
     case '3':
-      angleG+=10.;
-      rotGreen = toMat4(angleAxis((float)degrees(angleG), vec3(0.,0.,1.)));
+      angleG+=.5;
+      rotGreen = glm::rotate(trans, glm::radians(angleG), glm::vec3(0.0, 0.0, 1.0));
       glutPostRedisplay();
       break;
     case '4':
-      angleG-=10.;
-      rotGreen = toMat4(angleAxis((float)degrees(angleG), vec3(0.,0.,1.)));
+      angleG-=.5;
+      rotGreen = glm::rotate(trans, glm::radians(angleG), glm::vec3(0.0, 0.0, 1.0));
       glutPostRedisplay();
       break;
     case '5':
-      angleB+=10.;
-      rotBlue = toMat4(angleAxis((float)degrees(angleB), vec3(0.,0.,1.)));
+      angleB+=.5;
+      rotBlue = glm::rotate(trans, glm::radians(angleB), glm::vec3(0.0, 0.0, 1.0));
       glutPostRedisplay();
       break;
     case '6':
-      angleB-=10.;
-      rotBlue = toMat4(angleAxis((float)degrees(angleB), vec3(0.,0.,1.)));
+      angleB-=.5;
+      rotBlue = glm::rotate(trans, glm::radians(angleB), glm::vec3(0.0, 0.0, 1.0));
       glutPostRedisplay();
       break;
 
