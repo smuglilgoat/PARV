@@ -27,9 +27,9 @@ using namespace std;
 //****************************************
 #define NB_BRAS  4
 
-
-mat4 rotationInterpolMatrice,rotationInterpolQuaternion;
-
+quat defaultPos;
+mat4 rotRed,rotBlue,rotGreen;
+float angleR = 0., angleG = 0., angleB = 0.;
 //****************************************
 
 
@@ -54,17 +54,14 @@ void anim( int NumTimer)
     static int i=0;
     static time_point<system_clock> refTime = system_clock::now()  ;
 
-     time_point<system_clock> currentTime = system_clock::now(); // This and "end"'s type is std::chrono::time_point
+    time_point<system_clock> currentTime = system_clock::now(); // This and "end"'s type is std::chrono::time_point
 
-      duration<double> deltaTime = currentTime - refTime;
+    duration<double> deltaTime = currentTime - refTime;
 
-int delatTemps = duration_cast<milliseconds>( deltaTime).count() ;
+    int delatTemps = duration_cast<milliseconds>( deltaTime).count() ;
 
-
-
-           glutPostRedisplay();
-          glutTimerFunc(100,anim,1 );
-
+    glutPostRedisplay();
+    glutTimerFunc(100,anim,1 );
 }
 
 
@@ -84,13 +81,18 @@ int main(int argc,char **argv)
   glPointSize(10.0);
   glEnable(GL_DEPTH_TEST);
 
+  defaultPos = angleAxis((float)degrees(0.), vec3(0.,0.,1.));
+  rotRed = toMat4(defaultPos);
+  rotGreen = toMat4(defaultPos);
+  rotBlue = toMat4(defaultPos);
+
   /* enregistrement des fonctions de rappel */
   glutDisplayFunc(affichage);
   glutKeyboardFunc(clavier);
   glutReshapeFunc(reshape);
   glutMouseFunc(mouse);
   glutMotionFunc(mousemotion);
-  glutTimerFunc(200, anim, 1);
+  //glutTimerFunc(200, anim, 1);
 
   glMatrixMode( GL_PROJECTION );
      glLoadIdentity();
@@ -103,25 +105,31 @@ int main(int argc,char **argv)
 
 
 
-void bras()
-{
-
-
-// a animer pas interpolation de quaternions
+void bras() {
+    // a animer par interpolation de matrice
     glPushMatrix();
-    glMultMatrixf(&rotationInterpolQuaternion[0][0]);
+    glMultMatrixf(&rotRed[0][0]);
         glColor3f(1,0,0);
-        glScalef(2,.2,.2);
+        glScalef(1,.2,.2);
         glTranslatef(.5,0.,0.);
         glutSolidCube(1.);
     glPopMatrix();
 
     // a animer par interpolation de matrice
     glPushMatrix();
-    glMultMatrixf(&rotationInterpolMatrice[0][0]);
-        glColor3f(1,1,0);
+    glMultMatrixf(&rotGreen[0][0]);
+        glColor3f(0,1,0);
         glScalef(2,.2,.2);
-        glTranslatef(.5,0.,0.);
+        glTranslatef(1,0.,0.);
+        glutSolidCube(1.);
+    glPopMatrix();
+
+    // // a animer par interpolation de matrice
+    glPushMatrix();
+    glMultMatrixf(&rotBlue[0][0]);
+        glColor3f(0,0,1);
+        glScalef(1,.2,.2);
+        glTranslatef(3.5,0.,0.);
         glutSolidCube(1.);
     glPopMatrix();
 
@@ -174,21 +182,35 @@ void clavier(unsigned char touche,int x,int y)
   switch (touche)
     {
     case '1':
-//    orientation[0]+=.5;
-    glutPostRedisplay();
-    break;
-//  case '&':
-//  orientation[0]-=.5;
-//  glutPostRedisplay();
-//  break;
-  case '2':
-//  orientation[1]+=.5;
-  glutPostRedisplay();
-  break;
-//  case 'é':
-//  orientation[1]+=.5;
-//  glutPostRedisplay();
-//  break;
+      angleR+=10.;
+      rotRed = toMat4(angleAxis((float)degrees(angleR), vec3(0.,0.,1.)));
+      glutPostRedisplay();
+      break;
+    case '2':
+      angleR-=10.;
+      rotRed = toMat4(angleAxis((float)degrees(angleR), vec3(0.,0.,1.)));
+      glutPostRedisplay();
+      break;
+    case '3':
+      angleG+=10.;
+      rotGreen = toMat4(angleAxis((float)degrees(angleG), vec3(0.,0.,1.)));
+      glutPostRedisplay();
+      break;
+    case '4':
+      angleG-=10.;
+      rotGreen = toMat4(angleAxis((float)degrees(angleG), vec3(0.,0.,1.)));
+      glutPostRedisplay();
+      break;
+    case '5':
+      angleB+=10.;
+      rotBlue = toMat4(angleAxis((float)degrees(angleB), vec3(0.,0.,1.)));
+      glutPostRedisplay();
+      break;
+    case '6':
+      angleB-=10.;
+      rotBlue = toMat4(angleAxis((float)degrees(angleB), vec3(0.,0.,1.)));
+      glutPostRedisplay();
+      break;
 
   case 'p': /* affichage du carre plein */
       glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
