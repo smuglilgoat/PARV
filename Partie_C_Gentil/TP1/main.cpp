@@ -28,7 +28,8 @@ using namespace std;
 #define NB_BRAS  4
 
 quat defaultPos;
-mat4 rotRed,rotBlue,rotGreen;
+mat4 rotRed,rotBlue,rotGreen, rot;
+mat4 transRed,transBlue,transGreen;
 mat4 trans = glm::mat4(1.0f);
 float angleR = 0., angleG = 0., angleB = 0.;
 //****************************************
@@ -96,8 +97,8 @@ int main(int argc,char **argv)
   //glutTimerFunc(200, anim, 1);
 
   glMatrixMode( GL_PROJECTION );
-     glLoadIdentity();
-   gluPerspective(60 ,1,.1,30.);
+  glLoadIdentity();
+  gluPerspective(60 ,1,.1,30.);
 
   /* Entree dans la boucle principale glut */
   glutMainLoop();
@@ -107,27 +108,35 @@ int main(int argc,char **argv)
 
 
 void bras() {
-    glPushMatrix();
+  glPushMatrix();
     glMultMatrixf(&rotRed[0][0]);
-        glColor3f(1,0,0);
-        glScalef(1,.2,.2);
+    glColor3f(1,0,0);
+    glScalef(1,.2,.2);
+    glPushMatrix();
+      glTranslatef(.5,0.,0.);
+      glutSolidCube(1.);
+    glPopMatrix();
+    glPushMatrix();
+      glTranslatef(1.,0.,0.);
+      glMultMatrixf(&rotGreen[0][0]);
+      glColor3f(0,1,0);
+      glPushMatrix();
+        glScalef(1.,1.,1.);
         glTranslatef(.5,0.,0.);
         glutSolidCube(1.);
+      glPopMatrix();
+      glPushMatrix();
+        glTranslatef(1.,0.,0.);
+        glMultMatrixf(&rotBlue[0][0]);
+        glColor3f(0,0,1);
         glPushMatrix();
-      glMultMatrixf(&rotGreen[0][0]);
-        glColor3f(0,1,0);
-        glScalef(4,.2,.2);
-        glTranslatef(0.5,0.,0.);
-        glutSolidCube(1.);
-        glPushMatrix();
-          glMultMatrixf(&rotBlue[0][0]);
-          glColor3f(0,0,1);
-          glScalef(2,.2,.2);
+          glScalef(1.,1.,1.);
           glTranslatef(.5,0.,0.);
           glutSolidCube(1.);
         glPopMatrix();
       glPopMatrix();
     glPopMatrix();
+  glPopMatrix();
 }
 
 void affichage()
