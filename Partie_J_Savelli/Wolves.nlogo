@@ -4,14 +4,16 @@
 
 breed [sheeps sheep] ;; sheeps pour parler de l’ensemble des moutons
 breed [wolves wolf]
-wolves-own [hunger] ;; Les loups ont un attribut d ́eterminant leur faim
+sheeps-own [hunger]
+wolves-own [hunger energy] ;; Les loups ont un attribut d ́eterminant leur faim
 to setup ;; Initialise la simulation
   clear-all ;; Remet la simulation `a z ́ero
   set-default-shape wolves "wolf"
   create-wolves 10 ;; Cr ́ee 50 tortues de l’esp`ece loup
   ask wolves 
   [ set color gray  
-    fd 50 ]
+    fd 50 
+    set energy random 100]
   set-default-shape wolves "sheeps"
   create-sheeps 50
   [ set color brown  
@@ -26,9 +28,11 @@ end
 
 to go
   ask wolves [
-    fd 1            ;; forward 1 step
+    if energy > 0
+    [fd 1            ;; forward 1 step
     rt random 10    ;; turn right
     lt random 10    ;; turn left
+    set energy energy - 1]
   ]
   
   ask sheeps [
@@ -38,6 +42,8 @@ to go
   ]
   tick
 end
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Main Procedures ;;;
