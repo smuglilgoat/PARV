@@ -107,7 +107,7 @@ int main(int argc,char **argv)
 
 
 
-void bras() {
+void drawArm() {
   glPushMatrix();
     glMultMatrixf(&rotRed[0][0]);
     glColor3f(1,0,0);
@@ -151,7 +151,7 @@ glShadeModel(GL_SMOOTH);
   glRotatef(angley,1.0,0.0,0.0);
   glRotatef(anglex,0.0,1.0,0.0);
 
-        bras();
+        drawArm();
 
     //Repère
     //axe x en rouge
