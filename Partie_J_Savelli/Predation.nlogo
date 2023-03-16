@@ -1,11 +1,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Setup Procedures ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;
-
+;;; maelle.beuret@u-bourgogne.fr
 breed [sheeps sheep] ;; sheeps pour parler de l’ensemble des moutons
 breed [wolves wolf]
-sheeps-own [stask hunger gender ready-to-breed]
-wolves-own [wtask hunger energy] ;; Les loups ont un attribut d ́eterminant leur faim
+sheeps-own [stask hunger closest-predator]
+wolves-own [wtask energy closest-prey lead] ;; Les loups ont un attribut d ́eterminant leur faim
 to setup ;; Initialise la simulation
   clear-all ;; Remet la simulation `a z ́ero
 
@@ -14,7 +14,7 @@ to setup ;; Initialise la simulation
   [ set shape "wolf"
     set color black
     set size 1.5  ; easier to see
-    set energy random 50
+    set energy random 100
     set wtask "default"
   setxy 0 0]
 
@@ -24,8 +24,6 @@ to setup ;; Initialise la simulation
     set size 1.5  ; easier to see
     set hunger random 50
     set stask "default"
-    set gender random 2
-    set ready-to-breed true
     setxy random-xcor random-ycor]
 
   ask patches
@@ -54,31 +52,65 @@ to go
 end
 
 to go-sheep
+    if stask = "die" [ death ]
     if stask = "default" [ move-sheep ]
     if stask = "eat" [ eat ]
+    if stask = "reproduce" [ reproduce-sheep ]
 end
 
 to go-wolf
     if wtask = "default" [ move-wolf ]
     if wtask = "die" [ death ]
+    if wtask = "sleep" [ sleep ]
+    if wtask = "reproduce" [ reproduce-wolves ]
 end
 
 to move-wolf  ; turtle procedure
-  rt random 50
-  lt random 50
-  fd 1
-  set energy energy - 1
+  ifelse any? wolves with [lead = true][
+    face one-of wolves with [lead = true]
+    fd 1.5
+    set energy energy - 1.5
+  ]
+  [
+    set lead true
+  ]
+  if any? sheeps-on neighbors [
+    set energy energy + 20
+  ]
+  ifelse any? sheeps in-radius 3 [
+    set closest-prey min-one-of other sheeps [distance myself]
+    face closest-prey
+    fd 1.5
+    set energy energy - 1.5
+  ]
+  [
+    rt random 50
+    lt random 50
+    fd 1
+    set energy energy - 1
+  ]
   if energy < 0 [ set wtask "die" ]
+  if energy > 50 [ set wtask "sleep" ]
 end
 
 to move-sheep
-  rt random 50
-  lt random 50
-  fd 1
-  set hunger hunger + 5
+  if any? wolves-on neighbors
+    [set stask "die" ]
+  ifelse any? wolves in-radius 3 [
+    set closest-predator min-one-of other wolves [distance myself]
+    face closest-predator
+    rt 180
+    fd 1
+    set hunger hunger + 5
+  ]
+  [
+    rt random 50
+    lt random 50
+    fd 1
+    set hunger hunger + 5
+  ]
   if hunger > 100 [set stask "eat"]
-  if hunger > 80 [set ready-to-breed false]
-  ask neighbors with ready-to-breed []
+  if hunger < 80 [set stask "reproduce"]
 end
 
 to eat
@@ -87,9 +119,36 @@ to eat
   [set stask "default"]
 end
 
+to sleep
+  set lead false
+  move-to patch 0 0
+  if any? wolves-on self [
+    set wtask "reproduce"
+  ]
+  ifelse energy > 50
+  [set energy energy - 5]
+  [set wtask "default"]
+end
+
 
 to death  ; turtle procedure (i.e. both wolf and sheep procedure)
   die
+end
+
+to reproduce-sheep  ; sheep procedure
+  if random-float 100 < sheep-reproduce [  ; throw "dice" to see if you will reproduce
+    set hunger (hunger / 2)                ; divide energy between parent and offspring
+    hatch 1 [ rt random-float 360 fd 1 ]   ; hatch an offspring and move it forward 1 step
+  ]
+  set stask "default"
+end
+
+to reproduce-wolves  ; wolf procedure
+  if random-float 100 < wolf-reproduce [  ; throw "dice" to see if you will reproduce
+    set energy (energy / 2)               ; divide energy between parent and offspring
+    hatch 1  ; hatch an offspring and move it forward 1 step
+  ]
+  set wtask "sleep"
 end
 
 to display-labels
@@ -205,6 +264,36 @@ show-energy?
 0
 1
 -1000
+
+SLIDER
+21
+80
+193
+113
+sheep-reproduce
+sheep-reproduce
+1.0
+20.0
+1.0
+1.0
+1
+%
+HORIZONTAL
+
+SLIDER
+21
+113
+193
+146
+wolf-reproduce
+wolf-reproduce
+1.0
+20.0
+5.0
+1.0
+1
+%
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
